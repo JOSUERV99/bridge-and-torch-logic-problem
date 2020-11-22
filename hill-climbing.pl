@@ -11,13 +11,13 @@ solve_hill_climb(State,_,[]) :-
 
 /*
  * Si el Estado actual no es un estado final, genera una movida
- * para desplazarse a un nuevo estado, y continua la búsqueda a
+ * para desplazarse a un nuevo estado, y continua la bï¿½squeda a
  * partir de ese nuevo estado.
- * Las movidas son intentadas en el orden establecido por la heurística
- * que evalúa la "bondad" de los estados que se alcanzan para cada movida.
+ * Las movidas son intentadas en el orden establecido por la heurï¿½stica
+ * que evalï¿½a la "bondad" de los estados que se alcanzan para cada movida.
  */
 solve_hill_climb(State,History,[Move|Moves]) :-
-    hill_climb(State,Move),      % generar una nueva Movida en el orden heurístico
+    hill_climb(State,Move),      % generar una nueva Movida en el orden heurï¿½stico
     update(State,Move,State1),   % calcula nuevo estado usando Movida
     legal(State1),               % nuevo estado debe ser legal
     not(member(State1,History)), % debe ser primera vez que se llega al nuevo estado
@@ -25,13 +25,13 @@ solve_hill_climb(State,History,[Move|Moves]) :-
 
 /*
  *  A partir de un Estado devuelve una Movida.
- *  Primero genera todas las movidas, luego las evalúa usando una heurística,
- *  y finalmente las va usando en orden decreciente de la evaluación obtenida.
+ *  Primero genera todas las movidas, luego las evalï¿½a usando una heurï¿½stica,
+ *  y finalmente las va usando en orden decreciente de la evaluaciï¿½n obtenida.
  */
 hill_climb(State,Move) :-
     findall(M,move(State,M),Moves),         % Encuentra todas las movidas posibles
-    evaluate_and_order(Moves,State,[],MVs), % Evalúa con la heurística todas las movidas y las ordena.
-    member((Move,_),MVs).                   % Escoge movidas en orden de heurística
+    evaluate_and_order(Moves,State,[],MVs), % Evalï¿½a con la heurï¿½stica todas las movidas y las ordena.
+    member((Move,_),MVs).                   % Escoge movidas en orden de heurï¿½stica
 
 
 /*
@@ -44,11 +44,11 @@ hill_climb(State,Move) :-
 % Caso: procesar la primera movida y continuar recursivamente
 evaluate_and_order([Move|Moves],State,MVs,OrderedMVs) :-
     update(State,Move,State1),         % obtiene nuevo estado usando movida
-    value(State1,Value),               % calcula el valor heurísico del nuevo estado
+    value(State1,Value),               % calcula el valor heurï¿½sico del nuevo estado
     insertPair((Move,Value),MVs,MVs1), % inserta en orden el par (movida,valor) en lista de movidas
     evaluate_and_order(Moves,State,MVs1,OrderedMVs).  % procesa recursivamente el resto de movidas
     
-% Caso base: no hay más movidas que evaluar. Se retorna el acumulador como resultado.
+% Caso base: no hay mï¿½s movidas que evaluar. Se retorna el acumulador como resultado.
 evaluate_and_order([],_,MVs,MVs).
 
 insertPair(MV,[],[MV]).
@@ -65,7 +65,7 @@ insertPair((M,V),[(M1,V1)|MVs],[(M1,V1)|MVs1]) :-
  */
 test_hill_climb(Problem,Moves) :-
    initial_state(Problem,State),           % obtener un Estado inicial dado Problema
-   solve_hill_climb(State,[State],Moves).  % inicia resolución desde Estado
+   solve_hill_climb(State,[State],Moves).  % inicia resoluciï¿½n desde Estado
 
 
 
@@ -102,11 +102,11 @@ insert(X,[],[X]).
 select(X,[X|Xs],Xs).
 select(X,[Y|Ys],[Y|Zs]):-select(X,Ys,Zs).
 
-% Caso no determinístico
+% Caso no determinï¿½stico
 % precedes(zorra,_).
 % precedes(_,maiz).
 
-% Caso determinístico
+% Caso determinï¿½stico
 precedes(zorra,gallina).
 precedes(zorra,maiz).
 precedes(gallina,maiz).
@@ -121,9 +121,9 @@ ilegal(L):-member(gallina,L),member(maiz,L).
 % === Fin de las relaciones usadas por depth-first.pl ==%
 
 
-% === Relación adicional requerida por hill-climb para resolver zgm. === %
-% === Value/2 es una heurísica que da valores más altos conforme     === %
-% === haya más cosas en la rivera derecha.                           === %
+% === Relaciï¿½n adicional requerida por hill-climb para resolver zgm. === %
+% === Value/2 es una heurï¿½sica que da valores mï¿½s altos conforme     === %
+% === haya mï¿½s cosas en la rivera derecha.                           === %
 
 value(zgm(_,_,[]),0).
 value(zgm(_,_,[_]),1).

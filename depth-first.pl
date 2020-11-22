@@ -10,7 +10,7 @@ solve_dfs(Estado,_,[]) :- final_state(Estado).
 
 /*
  * Si el Estado actual no es un estado final, genera una movida
- * para desplazarse a un nuevo estado, y continua la búsqueda a
+ * para desplazarse a un nuevo estado, y continua la bï¿½squeda a
  * partir de ese nuevo estado.
  */
 solve_dfs(Estado,Historia,[Movida|Movidas]) :-
@@ -27,28 +27,28 @@ solve_dfs(Estado,Historia,[Movida|Movidas]) :-
  */
 test_dfs(Problema,Movidas) :-
       initial_state(Problema,Estado),      % obtener un Estado inicial dado Problema
-      solve_dfs(Estado,[Estado],Movidas).  % inicia resolución desde Estado
+      solve_dfs(Estado,[Estado],Movidas).  % inicia resoluciï¿½n desde Estado
 
 /*
- * El problema del maíz, la fgallina y la zorra se identifica con el átomo zgm.
+ * El problema del maï¿½z, la fgallina y la zorra se identifica con el ï¿½tomo zgm.
  * El estado tiene la siguiente estructura:
  *    zgm(PosicionBote, CosasEnRiveraIzquierda, CosasEnRiveraDerecha)
  * Las listas de ambas riveras deben estar ordenadas en la secuencia
  *    zorra, gallina, maiz
- * para evitar repetición de estados.
+ * para evitar repeticiï¿½n de estados.
  */
 
-% En el estado incial el bote está a la izquierda, todas las cosas están en la
+% En el estado incial el bote estï¿½ a la izquierda, todas las cosas estï¿½n en la
 % rivera izquierda y no hay nada a la derecha.
 initial_state(zgm,zgm(izq,[zorra,gallina,maiz],[])).
 
-% En el estado final el bote está a la derecha, todas las cosas están en la
+% En el estado final el bote estï¿½ a la derecha, todas las cosas estï¿½n en la
 % rivera derecha y no hay nada a la izquierda.
 final_state(zgm(der,[],[zorra,gallina,maiz])).
 
 /* Move genera movidas a partir de un estado
- * Bote a la izquierda, tomar cualquier cosa que esté a la izquierda
- * Bote a la izquierda, tomar cualquier cosa que esté a la izquierda
+ * Bote a la izquierda, tomar cualquier cosa que estï¿½ a la izquierda
+ * Bote a la derecha, tomar cualquier cosa que estï¿½ a la derecha
  * Bote en cualquier rivera, el granjero se puede devolver solo
  */
 move(zgm(izq,I,_),Carga):-member(Carga,I).
@@ -68,22 +68,22 @@ update_Bote(der,izq).
 
 
 /*
- * Actualizar las márgenes consiste en trasladar lo que fue transportado
- * en el bote quitándolo de la rivera dónde se tomó y poniéndolo en la otra.
+ * Actualizar las mï¿½rgenes consiste en trasladar lo que fue transportado
+ * en el bote quitï¿½ndolo de la rivera dï¿½nde se tomï¿½ y poniï¿½ndolo en la otra.
  *
  * update_margenes(Movida, RiveraIzquierdaVieja, RiveraDerechaVieja,
  *                         RiveraIzquierdaNueva, RiveraDerechaNueva)
  */
-% Si no se trasladó nada,
-%     no importa dónde estaba el bote, las riveras quedan igual
-update_margenes(solo,_,I,D,I,D). % No hay cambio porque no se trasladó nada.
+% Si no se trasladï¿½ nada,
+%     no importa dï¿½nde estaba el bote, las riveras quedan igual
+update_margenes(solo,_,I,D,I,D). % No hay cambio porque no se trasladï¿½ nada.
 
-% Bote arrancó de la izquierda, trasladar cosa de izquierda a derecha.
+% Bote arrancï¿½ de la izquierda, trasladar cosa de izquierda a derecha.
 update_margenes(Carga,izq,I,D,I1,D1):-
       select(Carga,I,I1),        % Quita de la rivera izquierda lo trasladado
       insert(Carga,D,D1).        % Inserta lo trasladado en la rivera derecha
 
-% Bote arrancó de la izquierda, trasladar cosa de izquierda a derecha.
+% Bote arrancï¿½ de la izquierda, trasladar cosa de izquierda a derecha.
 update_margenes(Carga,der,I,D,I1,D1):-
       select(Carga,D,D1),        % Quita de la rivera derecha lo trasladado
       insert(Carga,I,I1).        % Inserta lo trasladado en la rivera izquierda
@@ -93,11 +93,11 @@ update_margenes(Carga,der,I,D,I1,D1):-
  * insert(ElementoInsertado, ListaVieja, ListaNueva)
  *
  * Inserta en orden una de las cosas en una lista.
- * La relación precedes/2 establece el orden de las cosas: z < g < m.
+ * La relaciï¿½n precedes/2 establece el orden de las cosas: z < g < m.
  */
 insert(X,[Y|Ys],[X,Y|Ys]):-precedes(X,Y).   % Elemento va al inicio
-insert(X,[Y|Ys],[Y|Zs]):-precedes(Y,X),insert(X,Ys,Zs).  % Insertar más adentro.
-insert(X,[],[X]).                           % Insertar como único elemento.
+insert(X,[Y|Ys],[Y|Zs]):-precedes(Y,X),insert(X,Ys,Zs).  % Insertar mï¿½s adentro.
+insert(X,[],[X]).                           % Insertar como ï¿½nico elemento.
 
 
 /*
@@ -107,7 +107,7 @@ insert(X,[],[X]).                           % Insertar como único elemento.
  * y obtiene la lista sin ese elemento.
  */
 select(X,[X|Xs],Xs).                          % Extrae primer elemento.
-select(X,[Y|Ys],[Y|Zs]):-select(X,Ys,Zs).     % Extrae elemento de más adentro.
+select(X,[Y|Ys],[Y|Zs]):-select(X,Ys,Zs).     % Extrae elemento de mï¿½s adentro.
 
 
 /*
@@ -116,17 +116,17 @@ select(X,[Y|Ys],[Y|Zs]):-select(X,Ys,Zs).     % Extrae elemento de más adentro.
  * simplemente porque son permutaciones del mismo conjunto.
  */
 
-/* Caso no determinístico.
-   Las cláusulas no son excluyentes:
+/* Caso no determinï¿½stico.
+   Las clï¿½usulas no son excluyentes:
        ?-precedes(zorra,maiz).
-   genera dos veces la misma solución.
+   genera dos veces la misma soluciï¿½n.
 */
 % precedes(zorra,_).
 % precedes(_,maiz).
 
-/* Caso determinístico.
-   Las cláusulas son excluyentes,
-   nunca generan dos veces la misma solución.
+/* Caso determinï¿½stico.
+   Las clï¿½usulas son excluyentes,
+   nunca generan dos veces la misma soluciï¿½n.
 */
 
 precedes(zorra,gallina).
@@ -134,7 +134,7 @@ precedes(zorra,maiz).
 precedes(gallina,maiz).
 
 
-% Se revisa la legalidad de la rivera en la que no está el granjero.
+% Se revisa la legalidad de la rivera en la que no estï¿½ el granjero.
 legal(zgm(izq,_,D)):-not(ilegal(D)). % granjero a la izq., revisar rivera der.
 legal(zgm(der,I,_)):-not(ilegal(I)). % granjero a la der., revisar rivera izq.
 
