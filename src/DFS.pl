@@ -17,14 +17,16 @@ Problem:
     different time to cross the bridge.
 */
 
+:-include('Utils.pl').
+
 % problem params
 people([ ('Alberto',1),('Beatriz',2),('Carlos',5),('Dora',10),('Emilio',15) ]).
 timeAvailable(21). 
 amountAtTheSameTime(3).
 
 % problem states
-initial_state(ctb, ctb(people, [], timeAvailable)).
-final_state(ctb([], people, 0)).
+initial_state(ctb, ctb(P, [], timeAvailable)) :- people(P).
+final_state(ctb([], P, N)) :- N>=0, people(P).
 
 % problem predicates
-legal(CURRENT,LIMIT):-CURRENT=<LIMIT.
+legal(Current,Limit):-Current=<Limit. % check if the time is enough
