@@ -20,13 +20,24 @@ Problem:
 :-include('Utils.pl').
 
 % problem params
-people([ ('Alberto',1),('Beatriz',2),('Carlos',5),('Dora',10),('Emilio',15) ]).
-timeAvailable(21). 
-amountAtTheSameTime(3).
+people(alberto, 1).
+people(beatriz, 2).
+people(carlos,  5).
+people(dora,   10).
+people(emilio, 15).
+
+timeAvailable( 21 ). 
+amountAtTheSameTime( 3 ).
 
 % problem states
-initial_state(ctb, ctb(P, [], timeAvailable)) :- people(P).
-final_state(ctb([], P, N)) :- N>=0, people(P).
+initial_state(ctb, ctb(X, [], Ta)) :- 
+    getPeople(X),
+    timeAvailable(Ta).
+
+final_state(ctb([], People, N)) :- 
+    N >= 0, 
+    getPeople(X),
+    is_permutation(People, X).
 
 % problem predicates
 legal(Current,Limit):-Current=<Limit. % check if the time is enough
