@@ -3,7 +3,8 @@
         by: JosueRV99
 */
 
-sublist([], L).
+% generate all the sublists
+sublist([], []).
 sublist([X|Xs], [X|Ys]) :- sublist(Xs, Ys).
 sublist(Xs, [_|Ys]) :- sublist(Xs, Ys).
 
@@ -26,7 +27,7 @@ sumTime([[_,T]|Group], Acc, S) :-
 % insert elements in a list
 insert([Nn,Nt], [[Yn,Yt]|Ys], [[Nn,Nt],[Yn,Yt]|Ys]) :- 
     precedes([Nn,Nt],[Yn,Yt]).   
-insert([Nn,Nt], [[Yn,Yt]|Ys], [Y|Zs]) :- 
+insert([Nn,Nt], [[Yn,Yt]|Ys], [_|Zs]) :- 
     precedes([Yn,Yt],[Nn,Nt]),
     insert([Nn,Nt],Ys,Zs).  
 insert([Nn,Nt], [], [[Nn,Nt]]).                         
