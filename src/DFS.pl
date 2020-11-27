@@ -17,36 +17,72 @@ Problem:
     different time to cross the bridge.
 */
 
-% % Si el Estado actual es un estado final, no hay que moverse.
-% solve_dfs(Estado,_,[]) :- final_state(Estado).
+:- include('Utils.pl').
 
-% /*
-%  * Si el Estado actual no es un estado final, genera una movida
-%  * para desplazarse a un nuevo estado, y continua la b�squeda a
-%  * partir de ese nuevo estado.
-%  */
-% solve_dfs(Estado,Historia,[Movida|Movidas]) :-
-%       move(Estado,Movida),               % generar una nueva Movida
-%       update(Estado,Movida,Estado2),     % calcula nuevo estado usando Movida
-%       legal(Estado2),                    % nuevo estado debe ser legal
-%       not(member(Estado2,Historia)),     % debe ser primera vez que se llega al nuevo estado
-%       solve_dfs(Estado2,[Estado2|Historia],Movidas).   % continuar a partir de nuevo estado
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+/* Problem state definition: 
 
-:-include('Utils.pl').
+        ctb( <leftSide | rightSide>, PeopleAtLeft, PeopleAtRight, CurrentTime )
 
-% main functions
+    * [Sides         ]: Left or Right, refer to the bridge sides
+    * [PeopleAtLeft  ]: People on the left side of the bridge
+    * [PeopleAtRight ]: People on the right side of the bridge
+    * [CurrentTime   ]: Available current time
+*/
 
-% change between problem states
-move(ctb( leftSide,Left,_,_ ),N,newLeft,Load) :- 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% solving the problem using deep first search (DFS).
+% solve_dfs( State,_,[] ) :- 
+%     final_state(State).
+% solve_dfs( State,History,[Movement|Movements] ) :-
+%     timeAvailable(N),
+%     move(State,N,Movement,Rest),
+%     update(State,Movement,State2),
+%     legal(State2),
+%     not(member(State2,History)),
+%     solve_dfs(State2,[State2|History],Movements).
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% main functions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% change between problem states, def: (CurrentState, Limit, Crossers, NewMovement)
+move( ctb(leftSide,Left,_,_), N, Load, NewLeft) :- 
     createGroupsOfN(N,Left,Load),
-    subtract(Left,Load,newLeft).
-
-move(ctb( rightSide,_,Right,_ ),newRight,Load) :- 
-    select(X,Right,newRight),
+    subtract(Left,Load,NewLeft),
+    Load \= [].
+move( ctb(rightSide,_,Right,_), _, Load, NewRight) :- 
+    select(X,Right,NewRight),
     Load = [X].
 
-move(ctb( _,_,_ ),alone).
+% update the problem state, def: (CurrentState, Crossers, NewState)
+update(
+    ctb(CurrentSide,PeopleOnTheLeft,PeopleOnTheRight,CurrentTime),
+    Load,
+    ctb(NewSide,NewLeft,NewRight,NewCurrentTime)
+) :-
+    update_crossers(CurrentSide,NewSide),                     
+    update_sides(Load,CurrentSide,PeopleOnTheLeft,PeopleOnTheRight,NewLeft,NewRight),
+    update_time(CurrentTime,NewSide,NewLeft,NewRight,NewCurrentTime).
 
+% update the problem time using the current and new times from the crossers weight
+% def: (CurrentTime, bridgeSide, PeopleOnTheLeft, PeopleOnTheRigth, NewCurrentTime)
+update_time(CurrentTime, leftSide, PeopleOnTheLeft, _, NewCurrentTime) :-
+    sumTimes(PeopleOnTheLeft,RequiredTime),
+    NewCurrentTime is CurrentTime - RequiredTime.
+update_time(CurrentTime, rightSide, _, PeopleOnTheRight,NewCurrentTime) :-
+    sumTimes(PeopleOnTheRight,RequiredTime),
+    NewCurrentTime is CurrentTime - RequiredTime.
+
+% change the state where the crossers go trough the bridge
+update_crossers(leftSide, rightSide).
+update_crossers(rightSide,leftSide).
+
+% update the sides of the bridge
+update_sides(Load,leftSide,PeopleOnTheLeft,PeopleOnTheRight,NewLeft,NewRight) :-
+    selectOne(Load,PeopleOnTheLeft,NewLeft),        
+    insert(Load,PeopleOnTheRight,NewRight).        
+update_sides(Load,rightSide,PeopleOnTheLeft,PeopleOnTheRight,NewLeft,NewRight) :-
+    selectOne(Load,PeopleOnTheRight,NewRight),       
+    insert(Load,PeopleOnTheLeft,NewLeft).  
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % problem params
 people(alberto, 1).
 people(beatriz, 2).
@@ -57,7 +93,10 @@ people(emilio, 15).
 timeAvailable( 21 ). 
 amountAtTheSameTime( 3 ).
 
-% problem states
+% problem predicates
+legal(Current,Limit):-Current=<Limit. % check if the time is enough
+
+% problem start and stop
 initial_state(ctb, ctb(leftSide, X, [], Ta)) :- 
     getPeople(X),
     timeAvailable(Ta).
@@ -65,9 +104,5 @@ initial_state(ctb, ctb(leftSide, X, [], Ta)) :-
 final_state(ctb(rightSide, [], People, N)) :- 
     N >= 0, 
     getPeople(X),
-    is_permutation(People, X).
-
-% problem predicates
-legal(Current,Limit):-Current=<Limit. % check if the time is enough
-
-
+    is_permutation(X,People).
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
