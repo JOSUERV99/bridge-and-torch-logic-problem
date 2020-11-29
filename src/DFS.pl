@@ -19,36 +19,43 @@ Problem:
 
 :- include('Utils.pl').
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 /* Problem state definition: 
 
         ctb( <leftSide | rightSide>, PeopleAtLeft, PeopleAtRight, CurrentTime )
 
     * [Sides         ]: Left or Right, refer to the bridge sides
-    * [PeopleAtLeft  ]: People on the left side of the bridge
-    * [PeopleAtRight ]: People on the right side of the bridge
+    * [PeopleAtLeft  ]: People on the left side
+    * [PeopleAtRight ]: People on the right side
     * [CurrentTime   ]: Available current time
 */
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% solving the problem using deep first search (DFS).
-% solve_dfs( State,_,[] ) :- 
-%     final_state(State).
-% solve_dfs( State,History,[Movement|Movements] ) :-
-%     timeAvailable(N),
-%     move(State,N,Movement,Rest),
-%     update(State,Movement,State2),
-%     legal(State2),
-%     not(member(State2,History)),
-%     solve_dfs(State2,[State2|History],Movements).
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% main functions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+/* solving the problem using deep first search (DFS). */
+solve_dfs( State,_,[] ) :- 
+    final_state(State).
+
+solve_dfs( State,History,[Movement|Movements] ) :-
+    move(State,Movement),
+    update(State,Movement,State2),
+    legal(State2),
+    not(member(State2,History)),
+    write(State),
+    solve_dfs(State2,[State2|History],Movements).
+
+test(Problem,Solution) :-
+    initial_state(Problem, InitialState),
+    solve_dfs(InitialState,[InitialState],Solution).
+
+/* Main functions */
 % change between problem states, def: (CurrentState, Limit, Crossers, NewMovement)
-move( ctb(leftSide,Left,_,_), N, Load, NewLeft) :- 
-    createGroupsOfN(N,Left,Load),
-    subtract(Left,Load,NewLeft),
-    Load \= [].
-move( ctb(rightSide,_,Right,_), _, Load, NewRight) :- 
-    select(X,Right,NewRight),
+move( ctb(leftSide,Left,_,_), Load) :- 
+    createGroups(Left,Load).
+    % length(Load,M),
+    % M =< N,
+    % amountAtTheSameTime(N).
+
+move( ctb(rightSide,_,Right,_), _, Load) :- 
+    select(X,Right,_),
     Load = [X].
 
 % update the problem state, def: (CurrentState, Crossers, NewState)
@@ -57,15 +64,17 @@ update(
     Load,
     ctb(NewSide,NewLeft,NewRight,NewCurrentTime)
 ) :-
-    update_crossers(CurrentSide,NewSide),                     
-    update_sides(Load,CurrentSide,PeopleOnTheLeft,PeopleOnTheRight,NewLeft,NewRight),
-    update_time(CurrentTime,NewSide,NewLeft,NewRight,NewCurrentTime).
+    update_crossers(CurrentSide, NewSide),                     
+    update_sides(Load, CurrentSide, PeopleOnTheLeft, PeopleOnTheRight, NewLeft, NewRight),
+    update_time(CurrentTime, NewSide, NewLeft, NewRight, NewCurrentTime).
 
 % update the problem time using the current and new times from the crossers weight
 % def: (CurrentTime, bridgeSide, PeopleOnTheLeft, PeopleOnTheRigth, NewCurrentTime)
+
 update_time(CurrentTime, leftSide, PeopleOnTheLeft, _, NewCurrentTime) :-
     sumTimes(PeopleOnTheLeft,RequiredTime),
     NewCurrentTime is CurrentTime - RequiredTime.
+
 update_time(CurrentTime, rightSide, _, PeopleOnTheRight,NewCurrentTime) :-
     sumTimes(PeopleOnTheRight,RequiredTime),
     NewCurrentTime is CurrentTime - RequiredTime.
@@ -76,13 +85,14 @@ update_crossers(rightSide,leftSide).
 
 % update the sides of the bridge
 update_sides(Load,leftSide,PeopleOnTheLeft,PeopleOnTheRight,NewLeft,NewRight) :-
-    selectOne(Load,PeopleOnTheLeft,NewLeft),        
-    insert(Load,PeopleOnTheRight,NewRight).        
+    createGroups(Load,PeopleOnTheLeft),        
+    subtract(PeopleOnTheLeft, Load, NewLeft),
+    insert(Load,PeopleOnTheRight,NewRight). 
+
 update_sides(Load,rightSide,PeopleOnTheLeft,PeopleOnTheRight,NewLeft,NewRight) :-
     selectOne(Load,PeopleOnTheRight,NewRight),       
     insert(Load,PeopleOnTheLeft,NewLeft).  
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % problem params
 people(alberto, 1).
 people(beatriz, 2).
@@ -105,4 +115,3 @@ final_state(ctb(rightSide, [], People, N)) :-
     N >= 0, 
     getPeople(X),
     is_permutation(X,People).
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

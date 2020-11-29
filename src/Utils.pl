@@ -9,8 +9,8 @@ sublist([X|Xs], [X|Ys]) :- sublist(Xs, Ys).
 sublist(Xs, [_|Ys]) :- sublist(Xs, Ys).
 
 % generate all the groups not repeated with N elements
-createGroupsOfN(N, List, Z) :- 
-    findall(X, (sublist(X,List),length(X,N)), R),
+createGroups(List, Z) :- 
+    findall(X, sublist(X,List), R),
     setof(Y, member(Y,R), Result),
     member(Z, Result).
 
