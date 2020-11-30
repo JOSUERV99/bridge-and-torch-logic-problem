@@ -49,16 +49,11 @@ test(Problem,Solution) :-
 % change between problem states, def: (CurrentState, Limit, Crossers, NewMovement)
 move(ctb(leftSide,Left,_,_), Load) :- 
     createGroups(Left, Load),
-    length(Load, N),
-    amountAtTheSameTime(N).
+    length(Load, M), amountAtTheSameTime(N),
+    M =< N, M > 0.
 
-move(ctb(leftSide,Left,_,_), Load) :- 
-    length(Left,M),
-    amountAtTheSameTime(N),
-    M =< N,
-    Load = Left.
-
-move(ctb(rightSide,_,Right,_), Load) :- select(X,Right,_), Load = [X].
+move(ctb(rightSide,_,Right,_), Load) :- 
+    select(X,Right,_), Load = [X].
 
 % update the problem state, def: (CurrentState, Crossers, NewState)
 update(
