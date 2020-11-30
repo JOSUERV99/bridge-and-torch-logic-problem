@@ -39,24 +39,26 @@ solve_dfs( State,History,[Movement|Movements] ) :-
     update(State,Movement,State2),
     legal(State2),
     not(member(State2,History)),
-    write(State),
     solve_dfs(State2,[State2|History],Movements).
 
 test(Problem,Solution) :-
     initial_state(Problem, InitialState),
-    solve_dfs(InitialState,[InitialState],Solution).
+    solve_dfs(InitialState,[[],InitialState],Solution).
 
 /* Main functions */
 % change between problem states, def: (CurrentState, Limit, Crossers, NewMovement)
 move( ctb(leftSide,Left,_,_), Load) :- 
-    createGroups(Left,Load).
-    % length(Load,M),
-    % M =< N,
-    % amountAtTheSameTime(N).
+    createGroups(Left, Load),
+    length(Load, N),
+    amountAtTheSameTime(N).
 
-move( ctb(rightSide,_,Right,_), _, Load) :- 
-    select(X,Right,_),
-    Load = [X].
+move( ctb(leftSide,Left,_,_), Load) :- 
+    length(Left,M),
+    amountAtTheSameTime(N),
+    M =< N,
+    Load = Left.
+
+move( ctb(rightSide,_,Right,_), Load) :- select(X,Right,_), Load = [X].
 
 % update the problem state, def: (CurrentState, Crossers, NewState)
 update(
@@ -64,34 +66,28 @@ update(
     Load,
     ctb(NewSide,NewLeft,NewRight,NewCurrentTime)
 ) :-
-    update_crossers(CurrentSide, NewSide),                     
+    update_crossers(CurrentSide, NewSide),                  
     update_sides(Load, CurrentSide, PeopleOnTheLeft, PeopleOnTheRight, NewLeft, NewRight),
-    update_time(CurrentTime, NewSide, NewLeft, NewRight, NewCurrentTime).
+    update_time(CurrentTime, NewSide, Load, NewCurrentTime).
 
 % update the problem time using the current and new times from the crossers weight
 % def: (CurrentTime, bridgeSide, PeopleOnTheLeft, PeopleOnTheRigth, NewCurrentTime)
-
-update_time(CurrentTime, leftSide, PeopleOnTheLeft, _, NewCurrentTime) :-
-    sumTimes(PeopleOnTheLeft,RequiredTime),
-    NewCurrentTime is CurrentTime - RequiredTime.
-
-update_time(CurrentTime, rightSide, _, PeopleOnTheRight,NewCurrentTime) :-
-    sumTimes(PeopleOnTheRight,RequiredTime),
-    NewCurrentTime is CurrentTime - RequiredTime.
+update_time(CurrentTime, _, Load, NewCurrentTime) :-
+    maxTime(Load, MaxTime),
+    NewCurrentTime is CurrentTime - MaxTime.
 
 % change the state where the crossers go trough the bridge
 update_crossers(leftSide, rightSide).
 update_crossers(rightSide,leftSide).
 
 % update the sides of the bridge
-update_sides(Load,leftSide,PeopleOnTheLeft,PeopleOnTheRight,NewLeft,NewRight) :-
-    createGroups(Load,PeopleOnTheLeft),        
+update_sides(Load,leftSide,PeopleOnTheLeft,PeopleOnTheRight,NewLeft,NewRight) :-      
     subtract(PeopleOnTheLeft, Load, NewLeft),
-    insert(Load,PeopleOnTheRight,NewRight). 
+    append(Load, PeopleOnTheRight, NewRight).
 
 update_sides(Load,rightSide,PeopleOnTheLeft,PeopleOnTheRight,NewLeft,NewRight) :-
-    selectOne(Load,PeopleOnTheRight,NewRight),       
-    insert(Load,PeopleOnTheLeft,NewLeft).  
+    subtract(PeopleOnTheRight, Load, NewRight),    
+    append(Load,   PeopleOnTheLeft,   NewLeft).
 
 % problem params
 people(alberto, 1).
@@ -103,9 +99,6 @@ people(emilio, 15).
 timeAvailable( 21 ). 
 amountAtTheSameTime( 3 ).
 
-% problem predicates
-legal(Current,Limit):-Current=<Limit. % check if the time is enough
-
 % problem start and stop
 initial_state(ctb, ctb(leftSide, X, [], Ta)) :- 
     getPeople(X),
@@ -115,3 +108,7 @@ final_state(ctb(rightSide, [], People, N)) :-
     N >= 0, 
     getPeople(X),
     is_permutation(X,People).
+
+% problem predicates
+legal( ctb(_, _, _, CurrentTime) ) :- % check if the time is enough
+    CurrentTime >= 0.

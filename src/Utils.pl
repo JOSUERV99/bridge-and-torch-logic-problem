@@ -18,28 +18,32 @@ createGroups(List, Z) :-
 selectOne(X,[X|Xs],Xs).                          
 selectOne(X,[Y|Ys],[Y|Zs]) :- selectOne(X,Ys,Zs).     
 
-% sum all the times in a group
-sumTime([],S,S).
-sumTime([[_,T]|Group], Acc, S) :- 
-    Sum is Acc + T, 
-    sumTime(Group,Sum,S).
-
-% insert elements in a list
-insert([Nn,Nt], [[Yn,Yt]|Ys], [[Nn,Nt],[Yn,Yt]|Ys]) :- 
-    precedes([Nn,Nt],[Yn,Yt]).   
-insert([Nn,Nt], [[Yn,Yt]|Ys], [_|Zs]) :- 
-    precedes([Yn,Yt],[Nn,Nt]),
-    insert([Nn,Nt],Ys,Zs).  
-insert([Nn,Nt], [], [[Nn,Nt]]).                         
-
-% stablish a logic sequence
-precedes([N1,T1],[N2,T2]) :-
-    N1 \= N2,
-    T1 > T2.
+% find the max time from a [name, time] list using time
+maxTime([],0).
+maxTime([[_,T1]|Tail],Max) :-
+    maxTime(Tail,TailMax),
+    T1 > TailMax,
+    Max is T1.
+maxTime([[_,T1]|Tail],Max) :-
+    maxTime(Tail,TailMax),
+    T1 =< TailMax,
+    Max is TailMax.
 
 is_permutation(Xs, Ys) :-
     msort(Xs, Sorted),
     msort(Ys, Sorted).
+
+show_solution([]).
+show_solution([ ctb(rightSide,PeopleOnTheLeft,PeopleOnTheRight,CurrentTime) | Ss ]) :- 
+    write('\n['),
+    show_people(PeopleOnTheLeft), 
+    write(']\t['), 
+    show_people(PeopleOnTheRight), 
+    write(']\t\n(Current time:'), write(CurrentTime), write(')\n'),
+    show_solution(Ss).
+
+show_people([]).
+show_people([[N,_]|People]) :- write(N), write(' '), show_people(People).
 
 getPeople(X) :-
     findall( [P,T], people(P,T), X).
