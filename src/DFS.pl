@@ -43,22 +43,22 @@ solve_dfs( State,History,[Movement|Movements] ) :-
 
 test(Problem,Solution) :-
     initial_state(Problem, InitialState),
-    solve_dfs(InitialState,[[],InitialState],Solution).
+    solve_dfs(InitialState,[InitialState],Solution).
 
 /* Main functions */
 % change between problem states, def: (CurrentState, Limit, Crossers, NewMovement)
-move( ctb(leftSide,Left,_,_), Load) :- 
+move(ctb(leftSide,Left,_,_), Load) :- 
     createGroups(Left, Load),
     length(Load, N),
     amountAtTheSameTime(N).
 
-move( ctb(leftSide,Left,_,_), Load) :- 
+move(ctb(leftSide,Left,_,_), Load) :- 
     length(Left,M),
     amountAtTheSameTime(N),
     M =< N,
     Load = Left.
 
-move( ctb(rightSide,_,Right,_), Load) :- select(X,Right,_), Load = [X].
+move(ctb(rightSide,_,Right,_), Load) :- select(X,Right,_), Load = [X].
 
 % update the problem state, def: (CurrentState, Crossers, NewState)
 update(
@@ -100,15 +100,8 @@ timeAvailable( 21 ).
 amountAtTheSameTime( 3 ).
 
 % problem start and stop
-initial_state(ctb, ctb(leftSide, X, [], Ta)) :- 
-    getPeople(X),
-    timeAvailable(Ta).
-
-final_state(ctb(rightSide, [], People, N)) :- 
-    N >= 0, 
-    getPeople(X),
-    is_permutation(X,People).
+initial_state(ctb, ctb(leftSide, X, [], Ta)) :- getPeople(X), timeAvailable(Ta).
+final_state(ctb(rightSide, [], People, N)) :- N >= 0, getPeople(X), is_permutation(X,People).
 
 % problem predicates
-legal( ctb(_, _, _, CurrentTime) ) :- % check if the time is enough
-    CurrentTime >= 0.
+legal( ctb(_, _, _, CurrentTime) ) :- CurrentTime >= 0.
