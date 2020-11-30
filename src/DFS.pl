@@ -11,7 +11,7 @@ solve_dfs( State,History,[Movement|Movements] ) :-
     not(member(State2,History)),
     solve_dfs(State2,[State2|History],Movements).
 
-test(Problem,Solution) :-
+test_dfs(Problem,Solution) :-
     initial_state(Problem, InitialState),
     solve_dfs(InitialState,[InitialState],Solution).
 
@@ -33,11 +33,11 @@ update(
 ) :-
     update_crossers(CurrentSide, NewSide),                  
     update_sides(Load, CurrentSide, PeopleOnTheLeft, PeopleOnTheRight, NewLeft, NewRight),
-    update_time(CurrentTime, NewSide, Load, NewCurrentTime).
+    update_time(CurrentTime, Load, NewCurrentTime).
 
 % update the problem time using the current and new times from the crossers weight
 % def: (CurrentTime, bridgeSide, PeopleOnTheLeft, PeopleOnTheRigth, NewCurrentTime)
-update_time(CurrentTime, _, Load, NewCurrentTime) :-
+update_time(CurrentTime, Load, NewCurrentTime) :-
     maxTime(Load, MaxTime),
     NewCurrentTime is CurrentTime - MaxTime.
 
