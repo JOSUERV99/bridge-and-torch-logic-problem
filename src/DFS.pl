@@ -1,34 +1,4 @@
-/*
-Problem:
-    Some  friends are walking back to their hostel and
-    they  come across a dilapidated old wooden bridge.
-    The  bridge  is  very  weak  and  is  only able to
-    support the weight of some of them at a time. They
-    are  in  a  hurry  since  it is dusk and they must
-    cross  in the shortest possible time. They carry a
-    flashlight  that allows those who are crossing the
-    bridge to see, but it does not serve to illuminate
-    the  entire  bridge.  So if several of them cross,
-    one   of   the   crossers  must  return  with  the
-    flashlight to allow the others to cross.
-
-    Because  they  all  have different fitness levels,
-    and  some  are  injured,  it  takes each of them a
-    different time to cross the bridge.
-*/
-
 :- include('Utils.pl').
-
-
-/* Problem state definition: 
-
-        ctb( <leftSide | rightSide>, PeopleAtLeft, PeopleAtRight, CurrentTime )
-
-    * [Sides         ]: Left or Right, refer to the bridge sides
-    * [PeopleAtLeft  ]: People on the left side
-    * [PeopleAtRight ]: People on the right side
-    * [CurrentTime   ]: Available current time
-*/
 
 /* solving the problem using deep first search (DFS). */
 solve_dfs( State,_,[] ) :- 
