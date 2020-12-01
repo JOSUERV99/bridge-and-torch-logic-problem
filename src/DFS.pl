@@ -1,8 +1,10 @@
 :- include('Utils.pl').
 
 /* solving the problem using deep first search (DFS). */
-solve_dfs( State,_,[] ) :- 
-    final_state(State).
+solve_dfs( State,History,[] ) :- 
+    final_state(State),
+    reverse(History, Path),
+    write(Path).
 
 solve_dfs( State,History,[Movement|Movements] ) :-
     move(State,Movement),
@@ -48,11 +50,11 @@ update_crossers(rightSide,leftSide).
 % update the sides of the bridge
 update_sides(Load,leftSide,PeopleOnTheLeft,PeopleOnTheRight,NewLeft,NewRight) :-      
     subtract(PeopleOnTheLeft, Load, NewLeft),
-    append(Load, PeopleOnTheRight, NewRight).
+    insertAll(Load, PeopleOnTheRight, NewRight).
 
 update_sides(Load,rightSide,PeopleOnTheLeft,PeopleOnTheRight,NewLeft,NewRight) :-
     subtract(PeopleOnTheRight, Load, NewRight),    
-    append(Load,   PeopleOnTheLeft,   NewLeft).
+    insertAll(Load, PeopleOnTheLeft,  NewLeft).
 
 % problem params
 people(alberto, 1).

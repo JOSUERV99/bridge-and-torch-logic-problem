@@ -1,6 +1,6 @@
 :- include('Utils.pl').
 
-/* solving the problem using deep first search (DFS). */
+/* solving the problem using hill climb approach (HC). */
 solve_hill_climb( State,_,[] ) :- final_state(State).
 
 solve_hill_climb(State,History,[Move|Moves]) :-
@@ -89,5 +89,12 @@ final_state(ctb(rightSide, [], People, Time)) :- Time >= 0, getPeople(X), is_per
 % problem predicates
 legal( ctb(_, _, _, CurrentTime) ) :- CurrentTime >= 0.
 
-value(ctb(rightSide,_,PeopleOnTheRight,_),RequiredTime) :- bestCrosser(PeopleOnTheRight, RequiredTime).
-value(ctb(leftSide,PeopleOnTheLeft,_,_),RequiredTime)   :- bestCrosser(PeopleOnTheLeft, RequiredTime).
+value(ctb(rightSide,_,PeopleOnTheRight,_),Score) :- 
+    bestCrosser(PeopleOnTheRight, RequiredTime),
+    length(PeopleOnTheRight, N),
+    Score is RequiredTime - N.
+
+value(ctb(leftSide,PeopleOnTheLeft,_,_),Score)   :- 
+    bestCrosser(PeopleOnTheLeft, RequiredTime),
+    length(PeopleOnTheLeft, N),
+    Score is RequiredTime - N.
