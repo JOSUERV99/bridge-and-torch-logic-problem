@@ -92,9 +92,9 @@ legal( ctb(_, _, _, CurrentTime) ) :- CurrentTime >= 0.
 value(ctb(rightSide,_,PeopleOnTheRight,_),Score) :- 
     bestCrosser(PeopleOnTheRight, RequiredTime),
     length(PeopleOnTheRight, N),
-    Score is RequiredTime - N.
+    Score is RequiredTime*RequiredTime - N.
 
 value(ctb(leftSide,PeopleOnTheLeft,_,_),Score)   :- 
     bestCrosser(PeopleOnTheLeft, RequiredTime),
     length(PeopleOnTheLeft, N),
-    Score is RequiredTime - N.
+    Score is RequiredTime*RequiredTime - N.

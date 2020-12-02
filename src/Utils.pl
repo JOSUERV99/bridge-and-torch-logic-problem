@@ -32,11 +32,11 @@ maxTime([[_,T1]|Tail],Max) :-
     T1 =< TailMax, Max is TailMax.
 
 % find the min time from a [name, time] list using time
-bestCrosser([],0). 
+bestCrosser([],0.0). 
 bestCrosser([[_,T1]|Tail],Max) :-
-    bestCrosser(Tail,TailMax), T1 < TailMax, Max is T1.
+    bestCrosser(Tail,TailMax), T1 < TailMax, Max is float(T1).
 bestCrosser([[_,T1]|Tail],Max) :-
-    bestCrosser(Tail,TailMax),T1 >= TailMax, Max is TailMax.
+    bestCrosser(Tail,TailMax),T1 >= TailMax, Max is float(TailMax).
 
 is_permutation(Xs, Ys) :-
     msort(Xs, Sorted),
