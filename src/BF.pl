@@ -1,7 +1,7 @@
 :-include('CrossingTheBridge.pl').
 
 solve_best([punto(State,Path,_)|_],_,Moves) :-
-    final_state(State), reverse(Path,Moves).
+    final_state(State),reverse(Path,Moves).
 
 solve_best([punto(State,Path,_)|Frontier],History,FinalPath) :-
     findall(M,move(State,M),Moves),                  % obtiene movidas del mejor estado
@@ -61,3 +61,6 @@ test_best_search(Problem,Moves) :-
    initial_state(Problem,State),  
    value(State,Value),            
    solve_best([punto(State,[],Value)],[State],Moves). 
+
+test(S) :-
+    test_best_search(ctb,S).

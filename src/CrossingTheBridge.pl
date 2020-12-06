@@ -39,24 +39,29 @@ people(emilio, 15).
 timeAvailable( 21 ). 
 amountAtTheSameTime( 3 ).
 
+%value(ctb(rightSide, [], People, N), Score) :- getPeople(People), N >= 0, Score is -N*N.
+value(ctb(leftSide, [], People, N), Score) :- getPeople(People), N >= 0, Score is 0.
+
 value(ctb(rightSide,_,PeopleOnTheRight,_),Score) :- 
-    bestCrosser(PeopleOnTheRight, RequiredTime),
+    bestCrosser(PeopleOnTheRight, BestTime),
     length(PeopleOnTheRight, N),
-    Score is RequiredTime*RequiredTime - N.
+    Score is BestTime - N*N.
 
 value(ctb(leftSide,PeopleOnTheLeft,_,_),Score)   :- 
-    bestCrosser(PeopleOnTheLeft, RequiredTime),
+    bestCrosser(PeopleOnTheLeft, BestTime),
     length(PeopleOnTheLeft, N),
-    Score is RequiredTime*RequiredTime - N.
+    Score is BestTime - N*N.
 
 /* Main functions */
 % change between problem states, def: (CurrentState, Limit, Crossers, NewMovement)
 move(ctb(leftSide,Left,_,_), Load) :- 
     createGroups(Left, Load),
-    length(Load, M), amountAtTheSameTime(N),
+    length(Load, M), 
+    amountAtTheSameTime(N),
     M =< N, M > 0.
 
-move(ctb(rightSide,_,Right,_), [X]) :- member(X,Right).
+move(ctb(rightSide,[],Right,_), []) :- getPeople(Right).
+move(ctb(rightSide,_,Right,N), [X]) :- member(X,Right), N > 0.
 
 % update the problem state, def: (CurrentState, Crossers, NewState)
 update(
@@ -83,13 +88,13 @@ update_sides(Load,leftSide,PeopleOnTheLeft,PeopleOnTheRight,NewLeft,NewRight) :-
     subtract(PeopleOnTheLeft, Load, NewLeft),
     insertAll(Load, PeopleOnTheRight, NewRight).
 
-update_sides(Load,rightSide,PeopleOnTheLeft,PeopleOnTheRight,NewLeft,NewRight) :-
-    subtract(PeopleOnTheRight, Load, NewRight),    
-    insertAll(Load, PeopleOnTheLeft,  NewLeft).
+update_sides([X],rightSide,PeopleOnTheLeft,PeopleOnTheRight,NewLeft,NewRight) :-
+    subtract(PeopleOnTheRight, [X], NewRight),    
+    insert(X, PeopleOnTheLeft, NewLeft).
 
 % problem start and stop
 initial_state(ctb, ctb(leftSide, X, [], Ta)) :- getPeople(X), timeAvailable(Ta).
-final_state(ctb(rightSide, [], People, N)) :- N >= 0, getPeople(X), X=People.
+final_state(ctb(rightSide, [], People, N)) :- N >= 0, getPeople(People).
 
 % problem predicates
 legal( ctb(_, _, _, CurrentTime) ) :- CurrentTime >= 0.
