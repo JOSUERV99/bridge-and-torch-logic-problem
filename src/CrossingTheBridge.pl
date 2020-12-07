@@ -50,44 +50,46 @@ Problem state definition:
 % amountAtTheSameTime( 3 ).
 
 % case 3
-% people(alberto, 1).
-% people(beatriz, 2).
-% people(carlos,  5).
-% people(dora,   10).
-% people(emilio, 15).
-% people(julio,  20).
-% timeAvailable( 42  ). 
-% amountAtTheSameTime( 2 ).
-
-% % case 4
 people(alberto, 1).
 people(beatriz, 2).
 people(carlos,  5).
 people(dora,   10).
 people(emilio, 15).
 people(julio,  20).
-timeAvailable( 30 ). 
-amountAtTheSameTime( 3 ).
+timeAvailable( 42  ). 
+amountAtTheSameTime( 2 ).
 
-%value(ctb(rightSide, [], People, N), Score) :- getPeople(People), N >= 0, Score is -N*N.
+% % case 4
+% people(alberto, 1).
+% people(beatriz, 2).
+% people(carlos,  5).
+% people(dora,   10).
+% people(emilio, 15).
+% people(julio,  20).
+% timeAvailable( 30 ). 
+% amountAtTheSameTime( 3 ).
+
+value(ctb(rightSide,_,PeopleOnTheRight,_),Score) :- bestCrosser(PeopleOnTheRight, Score).
+
 value(ctb(leftSide, [], People, N), Score) :- getPeople(People), N >= 0, Score is 0.
-
-value(ctb(rightSide,_,PeopleOnTheRight,_),Score) :- 
-    bestCrosser(PeopleOnTheRight, BestTime),
-    length(PeopleOnTheRight, N),
-    Score is BestTime - N*N.
-
 value(ctb(leftSide,PeopleOnTheLeft,_,_),Score)   :- 
     bestCrosser(PeopleOnTheLeft, BestTime),
     length(PeopleOnTheLeft, N),
     Score is BestTime - N*N.
 
 % change between problem states, def: (CurrentState, Limit, Crossers, NewMovement)
-move(ctb(leftSide,PeopleOnTheLeft,_,_), Load) :- 
-    createGroups(PeopleOnTheLeft, Load),
-    length(Load, M), 
+move(ctb(leftSide,[],_,_), []).
+move(ctb(leftSide,PeopleOnTheLeft,_,_), PeopleOnTheLeft) :- 
     amountAtTheSameTime(N),
-    M =< N, M > 0.
+    length(PeopleOnTheLeft, M),
+    M =< N.
+
+move(ctb(leftSide,PeopleOnTheLeft,_,_), Load) :- 
+    amountAtTheSameTime(N),
+    length(PeopleOnTheLeft, M),
+    M > N,
+    createGroups(PeopleOnTheLeft, Load),
+    length(Load, N).
 
 move(ctb(rightSide,[],PeopleOnTheRight,_), []) :- getPeople(PeopleOnTheRight).
 move(ctb(rightSide,_,PeopleOnTheRight,N), [X]) :- member(X,PeopleOnTheRight), N > 0.
