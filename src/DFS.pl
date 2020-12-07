@@ -10,6 +10,7 @@ solve_dfs( State,History,[Movement|Movements] ) :-
     not(member(State2,History)),
     solve_dfs(State2,[State2|History],Movements).
 
+% testing...
 test_dfs(Problem,Solution) :-
     initial_state(Problem, InitialState),
     solve_dfs(InitialState,[InitialState],Solution).

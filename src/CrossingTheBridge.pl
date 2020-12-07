@@ -22,21 +22,51 @@ Problem state definition:
         ctb( <leftSide | rightSide>, PeopleAtLeft, PeopleAtRight, CurrentTime )
 
     * [Sides         ]: Left or Right, refer to the bridge sides
-    * [PeopleAtLeft  ]: People on the left side
-    * [PeopleAtRight ]: People on the right side
+    * [PeopleOnTheLeft  ]: People on the left side
+    * [PeopleOnTheRight ]: People on the right side
     * [CurrentTime   ]: Available current time
 */
 
 :- include('Utils.pl').
 
 % problem params
+
+% case 1
+% people(alberto, 1).
+% people(beatriz, 2).
+% people(carlos,  5).
+% people(dora,   10).
+% people(emilio, 15).
+% timeAvailable( 28 ). 
+% amountAtTheSameTime( 2 ).
+
+% case 2
+% people(alberto, 1).
+% people(beatriz, 2).
+% people(carlos,  5).
+% people(dora,   10).
+% people(emilio, 15).
+% timeAvailable( 21  ). 
+% amountAtTheSameTime( 3 ).
+
+% case 3
+% people(alberto, 1).
+% people(beatriz, 2).
+% people(carlos,  5).
+% people(dora,   10).
+% people(emilio, 15).
+% people(julio,  20).
+% timeAvailable( 42  ). 
+% amountAtTheSameTime( 2 ).
+
+% % case 4
 people(alberto, 1).
 people(beatriz, 2).
 people(carlos,  5).
 people(dora,   10).
 people(emilio, 15).
-
-timeAvailable( 21 ). 
+people(julio,  20).
+timeAvailable( 30 ). 
 amountAtTheSameTime( 3 ).
 
 %value(ctb(rightSide, [], People, N), Score) :- getPeople(People), N >= 0, Score is -N*N.
@@ -52,16 +82,15 @@ value(ctb(leftSide,PeopleOnTheLeft,_,_),Score)   :-
     length(PeopleOnTheLeft, N),
     Score is BestTime - N*N.
 
-/* Main functions */
 % change between problem states, def: (CurrentState, Limit, Crossers, NewMovement)
-move(ctb(leftSide,Left,_,_), Load) :- 
-    createGroups(Left, Load),
+move(ctb(leftSide,PeopleOnTheLeft,_,_), Load) :- 
+    createGroups(PeopleOnTheLeft, Load),
     length(Load, M), 
     amountAtTheSameTime(N),
     M =< N, M > 0.
 
-move(ctb(rightSide,[],Right,_), []) :- getPeople(Right).
-move(ctb(rightSide,_,Right,N), [X]) :- member(X,Right), N > 0.
+move(ctb(rightSide,[],PeopleOnTheRight,_), []) :- getPeople(PeopleOnTheRight).
+move(ctb(rightSide,_,PeopleOnTheRight,N), [X]) :- member(X,PeopleOnTheRight), N > 0.
 
 % update the problem state, def: (CurrentState, Crossers, NewState)
 update(
@@ -74,7 +103,6 @@ update(
     update_time(CurrentTime, Load, NewCurrentTime).
 
 % update the problem time using the current and new times from the crossers weight
-% def: (CurrentTime, bridgeSide, PeopleOnTheLeft, PeopleOnTheRigth, NewCurrentTime)
 update_time(CurrentTime, Load, NewCurrentTime) :-
     maxTime(Load, MaxTime),
     NewCurrentTime is CurrentTime - MaxTime.
