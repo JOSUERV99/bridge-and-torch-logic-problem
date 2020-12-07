@@ -29,7 +29,7 @@ Problem state definition:
 
 :- include('Utils.pl').
 
-% problem params
+% problem cases
 
 % case 1
 % people(alberto, 1).
@@ -50,16 +50,16 @@ Problem state definition:
 % amountAtTheSameTime( 3 ).
 
 % case 3
-people(alberto, 1).
-people(beatriz, 2).
-people(carlos,  5).
-people(dora,   10).
-people(emilio, 15).
-people(julio,  20).
-timeAvailable( 42  ). 
-amountAtTheSameTime( 2 ).
+% people(alberto, 1).
+% people(beatriz, 2).
+% people(carlos,  5).
+% people(dora,   10).
+% people(emilio, 15).
+% people(julio,  20).
+% timeAvailable( 42  ). 
+% amountAtTheSameTime( 2 ).
 
-% % case 4
+% case 4
 % people(alberto, 1).
 % people(beatriz, 2).
 % people(carlos,  5).
@@ -68,6 +68,14 @@ amountAtTheSameTime( 2 ).
 % people(julio,  20).
 % timeAvailable( 30 ). 
 % amountAtTheSameTime( 3 ).
+
+% case 5
+people(alberto, 1).
+people(beatriz, 2).
+people(carlos,  5).
+people(dora,   10).
+timeAvailable( 17 ). 
+amountAtTheSameTime( 2 ).
 
 value(ctb(rightSide,_,PeopleOnTheRight,_),Score) :- bestCrosser(PeopleOnTheRight, Score).
 
