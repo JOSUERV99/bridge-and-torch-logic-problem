@@ -1,2 +1,3 @@
-# CrossingTheBridge
-Small project to find the best solution to cross a bridge given some logic and time conditions
+# BridgeAndTorchProblem
+Logic puzzle that deals with people, a bridge and a torch, with some constraints.
+(Prolog, logical paradigm)
