@@ -77,9 +77,8 @@ people(dora,   10).
 timeAvailable( 17 ). 
 amountAtTheSameTime( 2 ).
 
+% assign a score to the given state
 value(ctb(rightSide,_,PeopleOnTheRight,_),Score) :- bestCrosser(PeopleOnTheRight, Score).
-
-value(ctb(leftSide, [], People, N), Score) :- getPeople(People), N >= 0, Score is 0.
 value(ctb(leftSide,PeopleOnTheLeft,_,_),Score)   :- 
     bestCrosser(PeopleOnTheLeft, BestTime),
     length(PeopleOnTheLeft, N),
